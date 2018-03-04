@@ -359,10 +359,8 @@ DeviceClient.prototype.ensureEventingServer = function(callback) {
 
         // Dispatch each event to each listener registered for
         // this service's events
-        listeners.forEach(function(listener) {
-          events.forEach(function(e) {
-            listener(e);
-          });
+        listeners.forEach(function(listener) {         
+            listener(events, req.headers);         
         });
         
         // be sure we quit response by sending back a 200 OK, otherwise well developed UPNP Devices will kick us out of their subscription list
