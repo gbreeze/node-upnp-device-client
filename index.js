@@ -12,7 +12,7 @@ var pkg = require('./package.json');
 var OS_VERSION = [os.platform(), os.release()].join('/');
 var PACKAGE_VERSION = [pkg.name, pkg.version].join('/');
 
-var SUBSCRIPTION_TIMEOUT = 300;
+var SUBSCRIPTION_TIMEOUT = 15;
 
 
 function DeviceClient(url) {
@@ -216,7 +216,8 @@ DeviceClient.prototype.subscribe = function(serviceId, listener) {
         }
 
         var sid = res.headers['sid'];
-        var timeout = parseTimeout(res.headers['timeout']);
+        var timeoutOrg = parseTimeout(res.headers['timeout']);
+        var timeout = 35;
 
         function renew() {
           debug('renew subscription to %s', serviceId);
@@ -238,9 +239,10 @@ DeviceClient.prototype.subscribe = function(serviceId, listener) {
               return;
             }
 
-            var timeout = parseTimeout(res.headers['timeout']);
+            var timeoutOrg = parseTimeout(res.headers['timeout']);
+            var timeout = 30
 
-            var renewTimeout = Math.max(timeout - 30, 30); // renew 30 seconds before expiration
+            var renewTimeout = 30 // Math.max(timeout - 30, 30); // renew 30 seconds before expiration
             debug('renewing subscription to %s in %d seconds', serviceId, renewTimeout);
             var timer = setTimeout(renew, renewTimeout * 1000);
             self.subscriptions[serviceId].timer = timer;
