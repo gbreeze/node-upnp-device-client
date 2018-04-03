@@ -175,7 +175,9 @@ DeviceClient.prototype.subscribe = function(serviceId, listener) {
     // If we already have a subscription to this service,
     // add the provided callback to the listeners and return
     this.subscriptions[serviceId].listeners.push(listener);
-    return;
+
+    // on an 412 error, we have to re-subscribe and go through the whole progress
+    // return;
   }
 
   // If there's no subscription to this service, create one
@@ -234,8 +236,17 @@ DeviceClient.prototype.subscribe = function(serviceId, listener) {
             if(res.statusCode !== 200) {
               var err = new Error('SUBSCRIBE renewal error');
               err.statusCode = res.statusCode;
-              // XXX: should we clear the subscription and release the server here ?
-              self.emit('error', err);
+                            
+              if(res.statusCode == 412)
+              {
+                // unauthenticated
+                // https://github.com/thibauts/node-upnp-device-client/issues/4
+
+                // self.unsubscribe(serviceId, listener);
+                self.subscribe(serviceId, listener);
+              }
+
+              self.emit('error', err);              
               return;
             }
 
