@@ -238,8 +238,7 @@ DeviceClient.prototype.subscribe = function(serviceId, listener) {
               var err = new Error('SUBSCRIBE renewal error');
               err.statusCode = res.statusCode;
                             
-              if(res.statusCode == 412)
-              {
+              if(res.statusCode == 412) {
                 // unauthenticated
                 // https://github.com/thibauts/node-upnp-device-client/issues/4
 
@@ -247,8 +246,10 @@ DeviceClient.prototype.subscribe = function(serviceId, listener) {
                 // self.unsubscribe(serviceId, listener);
                 self.subscribe(serviceId, listener);
               }
+              else {
+                self.emit('error', err);              
+              }
 
-              self.emit('error', err);              
               return;
             }
 
